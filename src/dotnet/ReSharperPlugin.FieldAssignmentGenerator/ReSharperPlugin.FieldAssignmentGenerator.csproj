@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <IsPackable>True</IsPackable>
+    <DefineConstants>$(DefineConstants);RESHARPER</DefineConstants>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="JetBrains.Rider.SDK" Version="$(SdkVersion)" PrivateAssets="all" />
+    <PackageReference Include="Wave" Version="$(WaveVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\..\..\dependencies.json" PackagePath="" Pack="true" Visible="false" />
+    <Content Include="bin\$(AssemblyName)\$(Configuration)\$(AssemblyName).dll" PackagePath="dotFiles" Pack="true" Visible="false" />
+    <Content Include="bin\$(AssemblyName)\$(Configuration)\$(AssemblyName).pdb" PackagePath="dotFiles" Pack="true" Visible="false" />
+
+    <!-- TODO: add additional assemblies -->
+  </ItemGroup>
+  
+  <ItemGroup>
+      <EmbeddedResource Include="Actions.xml" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Compile Update="Actions.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Actions.xml</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Reference Include="JetBrains.ReSharper.Cpp">
+      <HintPath>E:\GradleCache\caches\9.0.0\transforms\93b28b8c8a6a6d17b587b7896d27659f\transformed\CLion-2026.1-win\plugins\clion-radler\DotFiles\JetBrains.ReSharper.Cpp.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

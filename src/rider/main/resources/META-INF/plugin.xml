@@ -1,0 +1,34 @@
+<idea-plugin require-restart="true">
+  <id>com.jetbrains.rider.plugins.fieldassignmentgenerator</id>
+  <name>FieldAssignmentGenerator</name>
+  <version>_PLACEHOLDER_</version>
+  <vendor url="https://project-url">Author</vendor>
+  <idea-version since-build="_PLACEHOLDER_" until-build="_PLACEHOLDER_" />
+
+  <description>
+    <![CDATA[
+<p>Sample description teeeeeeeeeeeeeeeeeeeeeeeeest</p>
+]]>
+  </description>
+
+  <depends>com.intellij.modules.clion</depends>
+
+  <depends>com.intellij.modules.jetbrains</depends>
+  <depends>com.intellij.modules.platform</depends>
+  <depends>com.intellij.modules.lang</depends>
+
+  <extensions defaultExtensionNs="com.intellij">
+    <completion.contributor language="any" implementationClass="com.yaetoti.FieldAssignmentCompletionContributor"/>
+  </extensions>
+
+  <actions>
+    <action id="com.example.yourplugin.MyAction"
+            class="com.yaetoti.MyAction"
+            text="Run My Custom Action"
+            description="Triggers the test execution protocol command">
+
+      <add-to-group group-id="ToolsMenu" anchor="last"/>
+    </action>
+  </actions>
+
+</idea-plugin>

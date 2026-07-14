@@ -2,85 +2,15 @@ using System;
 using System.IO;
 using JetBrains.Application.Parts;
 using JetBrains.Application.Threading;
-using JetBrains.Application.UI.Icons.FeaturesIntellisenseThemedIcons;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.Rd.Tasks;
-using JetBrains.ReSharper.Feature.Services.CodeCompletion;
-using JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure;
-using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.Cpp.Language;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.Rider.Model;
 using JetBrains.Util;
-using JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems;
-using JetBrains.ReSharper.Feature.Services.Cpp.CodeCompletion;
-using JetBrains.UI.Icons;
+
 
 namespace ReSharperPlugin.FieldAssignmentGenerator;
-
-public class MyLogger {
-  private string m_content = "";
-  
-  public MyLogger Append(string message) {
-    m_content += message;
-    return this;
-  }
-  
-  public MyLogger Log(string message) {
-    m_content += message + "\n";
-    return this;
-  }
-
-  public MyLogger Dump(string file) {
-    File.WriteAllText(@"C:\temp\" + file, m_content);
-    return this;
-  }
-
-  public MyLogger Clear() {
-    m_content = "";
-    return this;
-  }
-}
-
-public class MyLookupItemBase : CppNoHotspotsLookupItem {
-  // TODO replace with live template completion icon. Idk where tf it is
-  public override IconId Image => FeaturesIntellisenseThemedIcons.EditorOptionsPage.Id;
-  public override string Text => m_text;
-
-  private string m_text;
-  
-  public MyLookupItemBase(CppCodeCompletionContext context) {
-    // Input
-    var text = "Generate field assignments";
-    var rank = CppCompletionRanks.GenerateImplementationEntity;
-
-    // Constructor
-    m_text = text;
-    
-    var placement = new LookupItemPlacement(m_text, rank.ToRank(), PlacementLocation.Top);
-    placement.Relevance = (ulong) ((CppCompletionRanks) placement.Relevance | rank);
-    Placement = placement;
-    
-    var ranges = context.CompletionRanges;
-    Ranges = ranges;
-    VisualReplaceRangeMarker = ranges.CreateVisualReplaceRangeMarker();
-  }
-}
-
-[Language(typeof(CppLanguage))]
-public class MyCppCompletionProvider : ItemsProviderOfSpecificContext<CppCodeCompletionContext> {
-  protected override bool IsAvailable(CppCodeCompletionContext context) {
-    new MyLogger().Log("completion").Dump("completion.txt");
-    return context.BasicContext.CodeCompletionType == CodeCompletionType.BasicCompletion ||
-           context.BasicContext.CodeCompletionType == CodeCompletionType.SmartCompletion;
-  }
-
-  protected override bool AddLookupItems(CppCodeCompletionContext context, IItemsCollector collector) {
-    collector.Add(new MyLookupItemBase(context));
-    return true;
-  }
-}
 
 [SolutionComponent(Instantiation.ContainerAsyncPrimaryThread)]
 public class MyTestFrameworkBackendExt2 {

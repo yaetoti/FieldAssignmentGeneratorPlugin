@@ -17,9 +17,10 @@
   <depends>com.intellij.modules.platform</depends>
   <depends>com.intellij.modules.lang</depends>
 
-  <extensions defaultExtensionNs="com.intellij">
-    <completion.contributor language="any" implementationClass="com.yaetoti.FieldAssignmentCompletionContributor"/>
-  </extensions>
+<!--  TODO remove-->
+<!--  <extensions defaultExtensionNs="com.intellij">-->
+<!--    <completion.contributor language="any" implementationClass="com.yaetoti.FieldAssignmentCompletionContributor"/>-->
+<!--  </extensions>-->
 
   <actions>
     <action id="com.example.yourplugin.MyAction"

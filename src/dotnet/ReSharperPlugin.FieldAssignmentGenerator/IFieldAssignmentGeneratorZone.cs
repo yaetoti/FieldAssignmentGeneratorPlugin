@@ -5,4 +5,4 @@ namespace ReSharperPlugin.FieldAssignmentGenerator;
 
 [ZoneDefinition]
 // [ZoneDefinitionConfigurableFeature("Title", "Description", IsInProductSection: false)]
-public interface IFieldAssignmentGeneratorZone : IZone;
+public interface IFieldAssignmentGeneratorZone : ILanguageCppZone;

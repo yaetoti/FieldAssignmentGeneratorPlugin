@@ -17,6 +17,9 @@ using JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupI
 using JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems.Impl;
 using JetBrains.ReSharper.Feature.Services.Cpp.CodeCompletion;
 using JetBrains.ReSharper.Feature.Services.Cpp.CodeStyle;
+using JetBrains.ReSharper.Feature.Services.LiveTemplates.Hotspots;
+using JetBrains.ReSharper.Feature.Services.LiveTemplates.LiveTemplates;
+using JetBrains.ReSharper.Feature.Services.LiveTemplates.Templates;
 using JetBrains.ReSharper.Feature.Services.Resources;
 using JetBrains.ReSharper.Psi.CodeStyle;
 using JetBrains.ReSharper.Psi.Cpp.Expressions;
@@ -30,6 +33,36 @@ using JetBrains.Util.dataStructures.TypedIntrinsics;
 using JetBrains.Util.Media;
 
 namespace ReSharperPlugin.FieldAssignmentGenerator;
+
+// Stolen from CppCompleteDesignatedInitializationItemsProvider
+internal class HotspotExpression : IHotspotExpression {
+  public string EvaluateQuickResult(IHotspotContext context) => "";
+
+  public void HandleExpansion(IHotspotContext context) {
+    ITextControl openedTextControl = context.GetOpenedTextControl();
+    if (openedTextControl == null) {
+      return;
+    }
+    
+    ITextControlSelection selection = openedTextControl.Selection;
+    DocumentRange expressionRange = context.ExpressionRange;
+    TextRange textRange = expressionRange.TextRange;
+    selection.SetRange(textRange);
+    ISolution solution = context.SessionContext.Solution;
+    expressionRange = context.ExpressionRange;
+    if (expressionRange.Document.GetPsiSourceFile(solution) == null) {
+      return;
+    }
+    
+    solution.GetComponent<ICodeCompletionSessionManager>().ExecuteManualCompletion(CodeCompletionType.BasicCompletion, openedTextControl, solution, EmptyAction.Instance, EvaluationMode.Light, AutoAcceptBehaviour.DoNotAutoAccept, LookupReplaceBehaviour.AlwaysReplace, LookupFocusBehaviour.Soft);
+  }
+
+  public HotspotItems GetLookupItems(IHotspotContext context) => HotspotItems.Empty;
+
+  public object Clone() => throw new NotImplementedException();
+
+  public string Serialize() => throw new NotImplementedException();
+}
 
 // References:
 // CppItemCollector::ConfigureCompleteDesignatedInitializationPlacement()
@@ -156,6 +189,7 @@ public class MyLookupItemBase : TextLookupItemBase {
     
     // TODO add hotspot offset
     // Build text
+    var hotspotOffsets = new List<int>();
     var sb = new StringBuilder();
     for (int i = 0; i < suitableFields.Count; ++i) {
       var field = suitableFields[i];
@@ -171,7 +205,9 @@ public class MyLookupItemBase : TextLookupItemBase {
       if (spaceAroundAssignment) sb.Append(' ');
       sb.Append("=");
       if (spaceAroundAssignment) sb.Append(' ');
-        
+      
+      hotspotOffsets.Add(start + sb.Length);
+      
       sb.Append(";\n");
       sb.Append(indentText);
     }
@@ -191,6 +227,24 @@ public class MyLookupItemBase : TextLookupItemBase {
     finally {
       Text = string.Empty;
     }
+    
+    // Start hotspot session
+    var hotspotInfoList = new List<HotspotInfo>(hotspotOffsets.Count);
+    foreach (int offset in hotspotOffsets) {
+      var name = $"hotspot#{offset}";
+      var documentRange = new DocumentRange(document, offset);
+      //IHotspotExpression expression = new TextHotspotExpression(new List<string>([string.Empty]));
+      IHotspotExpression expression = new HotspotExpression();
+      hotspotInfoList.Add(new HotspotInfo(new TemplateField(name, expression, 0), documentRange));
+    }
+    
+    LiveTemplatesManager.Instance.CreateHotspotSessionAtopExistingText(
+      m_context.BasicContext.Solution,
+      new DocumentOffset(document, start + text.Length),
+      textControl,
+      LiveTemplatesManager.EscapeAction.LeaveTextAndCaret,
+      hotspotInfoList.ToArray()
+    ).ExecuteAndForget();
   }
 
   private void Test0(ITextControl textControl, DocumentRange nameRange, LookupItemInsertType insertType, Suffix suffix, ISolution solution, bool keepCaretStill) {

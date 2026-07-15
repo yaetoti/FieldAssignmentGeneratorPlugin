@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Text;
 using JetBrains.Annotations;
 using JetBrains.DocumentModel;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Feature.Services.Lookup;
-using JetBrains.ReSharper.Psi.Cpp.Lookup;
-using JetBrains.ReSharper.Psi.Cpp.Resolve;
 using JetBrains.ReSharper.Psi.Cpp.Symbols;
 using JetBrains.ReSharper.Psi.Cpp.Tree;
 using JetBrains.TextControl;
@@ -16,13 +16,16 @@ using JetBrains.ReSharper.Psi.Cpp.Language;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems.Impl;
 using JetBrains.ReSharper.Feature.Services.Cpp.CodeCompletion;
+using JetBrains.ReSharper.Feature.Services.Cpp.CodeStyle;
 using JetBrains.ReSharper.Feature.Services.Resources;
+using JetBrains.ReSharper.Psi.CodeStyle;
 using JetBrains.ReSharper.Psi.Cpp.Expressions;
-using JetBrains.ReSharper.Psi.Cpp.Types;
+using JetBrains.ReSharper.Psi.Format;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.UI.Icons;
 using JetBrains.UI.RichText;
 using JetBrains.Util;
+using JetBrains.Util.dataStructures.TypedIntrinsics;
 using JetBrains.Util.Media;
 
 namespace ReSharperPlugin.FieldAssignmentGenerator;
@@ -32,6 +35,7 @@ namespace ReSharperPlugin.FieldAssignmentGenerator;
 // CppCompleteDesignatedInitializationItemsProvider
 // CppItemsProviderOnReferenceExpression - calls add items of designated
 // CppCompletionTreeUtil - gets designated initialization members
+// CppFormattingSettingsKey - settings
 public class MyLookupItemBase : TextLookupItemBase {
   public const string NAME = "<generate-field-assignments>";
   
@@ -57,14 +61,17 @@ public class MyLookupItemBase : TextLookupItemBase {
       return;
     }
 
+    // Filter context (expression)
+    if (node.GetContainingNode<ICppExpressionNode>() is null) {
+      TcpLogger.SLog("Not inside ICppExpressionNode");
+      return;
+    }
+
     var nodeContainer = node.GetContainingNode<MemberAccessExpression>();
     if (nodeContainer is null) {
       TcpLogger.SLog("nodeContainer is null");
       return;
     }
-    
-    // TODO get desired text / range
-    TcpLogger.SLog($"- Desired text:\n{nodeContainer.GetText()}");
 
     if (nodeContainer.Qualifier is not ICppAnyResolvedReferenceExpression qualifier) {
       TcpLogger.SLog("Qualifier is not ICppAnyResolvedReferenceExpression");
@@ -83,6 +90,7 @@ public class MyLookupItemBase : TextLookupItemBase {
       return;
     }
 
+    // Filter struct and class
     var classKey = classResolveEntity.GetKey();
     if (classKey != CppClassKey.CLASS && classKey != CppClassKey.STRUCT) {
       TcpLogger.SLog("Internal type is not class or struct");
@@ -102,11 +110,13 @@ public class MyLookupItemBase : TextLookupItemBase {
       }
       
       foreach (var variable in classChildPack.GetGroupedVariables()) {
+        // Filter non-static fields
         if (!variable.IsNonStaticField()) {
           continue;
         }
-        
+
         // TODO check relative accessibility
+        // Filter accessibility
         if (variable.GetAccessibility() != CppAccessibility.PUBLIC) {
           continue;
         }
@@ -129,19 +139,42 @@ public class MyLookupItemBase : TextLookupItemBase {
     string qualifierText = nodeContainer.Qualifier.GetText();
     string signText = nodeContainer.Sign.GetText();
 
+    // Extract settings
+    var settings = m_context.BasicContext.ContextBoundSettingsStore;
+    var indentStyle = settings.GetValue<CppFormattingSettingsKey, IndentStyle>(key => key.INDENT_STYLE);
+    var indentSize = settings.GetValue<CppFormattingSettingsKey, int>(key => key.INDENT_SIZE);
+    var spaceAroundAssignment = settings.GetValue<CppFormattingSettingsKey, bool>(key => key.SPACE_AROUND_ASSIGNMENT_OPERATOR);
+    var spaceAroundDot = settings.GetValue<CppFormattingSettingsKey, bool>(key => key.SPACE_AROUND_DOT);
+    
+    var indentText = DocumentIndentUtils.GetLineIndent(document, new DocumentOffset(document, start).ToDocumentCoords().Line);
+    
     TcpLogger.SLog($"QualifierText: {qualifierText}");
     TcpLogger.SLog($"SignText: {signText}");
     TcpLogger.SLog($"Range: {start} - {end}");
-
+    
+    // TODO add hotspot offset
     // Build text
     var sb = new StringBuilder();
-    foreach (var field in suitableFields) {
+    for (int i = 0; i < suitableFields.Count; ++i) {
+      var field = suitableFields[i];
+
+      if (i != 0) {
+        sb.Append(indentText);
+      }
+      
       sb.Append(qualifierText);
+        
+      if (spaceAroundDot) sb.Append(' ');
       sb.Append(signText);
+      if (spaceAroundDot) sb.Append(' ');
+        
       sb.Append(field);
-      sb.Append(" = ;\n");
-      // TODO add hotspot offset
-      // TODO get indents and spaces from config
+        
+      if (spaceAroundAssignment) sb.Append(' ');
+      sb.Append("=");
+      if (spaceAroundAssignment) sb.Append(' ');
+        
+      sb.Append(";\n");
     }
 
     var text = sb.ToString();

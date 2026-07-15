@@ -20,6 +20,7 @@ using JetBrains.ReSharper.Feature.Services.Cpp.CodeStyle;
 using JetBrains.ReSharper.Feature.Services.Resources;
 using JetBrains.ReSharper.Psi.CodeStyle;
 using JetBrains.ReSharper.Psi.Cpp.Expressions;
+using JetBrains.ReSharper.Psi.Cpp.Resolve;
 using JetBrains.ReSharper.Psi.Format;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.UI.Icons;
@@ -55,6 +56,9 @@ public class MyLookupItemBase : TextLookupItemBase {
   }
 
   public override void Accept(ITextControl textControl, DocumentRange nameRange, LookupItemInsertType insertType, Suffix suffix, ISolution solution, bool keepCaretStill) {
+    Test0(textControl, nameRange, insertType, suffix, solution, keepCaretStill);
+    
+    // Getting node is better because m_context.MemberAccessExpression's offsets are inconsistent. They may be correct and may be 0
     var node = GetNodeUnderCaret();
     if (node is null) {
       TcpLogger.SLog("node is null");
@@ -67,29 +71,31 @@ public class MyLookupItemBase : TextLookupItemBase {
       return;
     }
 
-    var nodeContainer = node.GetContainingNode<MemberAccessExpression>();
-    if (nodeContainer is null) {
+    if (node.Parent is not MemberAccessExpression accessExpression) {
       TcpLogger.SLog("nodeContainer is null");
       return;
     }
-
-    if (nodeContainer.Qualifier is not ICppAnyResolvedReferenceExpression qualifier) {
+    
+    // Getting the class type
+    if (accessExpression.Qualifier is not ICppAnyResolvedReferenceExpression qualifier) {
       TcpLogger.SLog("Qualifier is not ICppAnyResolvedReferenceExpression");
       return;
     }
-
-    if (qualifier.GetResolvedReference().GetPrimaryEntity() is not ICppVariableDeclaratorResolveEntity resolveEntity) {
-      TcpLogger.SLog("GetPrimaryEntityIfStatusIsOk() as ICppVariableDeclaratorResolveEntity is null");
+    
+    if (qualifier.GetResolvedReference().GetPrimaryEntityIfStatusIsOk() is not ICppDeclaratorResolveEntity resolveEntity) {
+      TcpLogger.SLog("GetPrimaryEntityIfStatusIsOk() as ICppDeclaratorResolveEntity is null");
       return;
     }
-    
+
     var cppType = resolveEntity.GetCppType();
-    var classResolveEntity = cppType.InternalAs<CppClassResolveEntity>();
+    var classResolveEntity = cppType.InternalAs<ICppClassResolveEntity>();
     if (classResolveEntity is null) {
       TcpLogger.SLog("Internal type is null");
       return;
     }
-
+    
+    // TODO classResolveEntity.GetBases() for base classes
+    
     // Filter struct and class
     var classKey = classResolveEntity.GetKey();
     if (classKey != CppClassKey.CLASS && classKey != CppClassKey.STRUCT) {
@@ -97,11 +103,7 @@ public class MyLookupItemBase : TextLookupItemBase {
       return;
     }
     
-    // TODO debug
-    TcpLogger.SLogType("CppType", cppType);
-    TcpLogger.SLogType("Internal Type", classResolveEntity);
-    TcpLogger.SLogType("Class key", classKey);
-
+    // TODO replace classResolveEntity.GetAggregateMembers()
     // Find suitable fields
     var suitableFields = new List<string>();
     foreach (var classChild in classResolveEntity.GetChildren()) {
@@ -133,11 +135,11 @@ public class MyLookupItemBase : TextLookupItemBase {
     
     // Extract useful info
     var document = m_context.BasicContext.Document;
-    int start = nodeContainer.Qualifier.GetDocumentRange().StartOffset.Offset;
+    int start = accessExpression.Qualifier.GetDocumentRange().StartOffset.Offset;
     int end = m_context.BasicContext.CaretDocumentOffset.Offset;
 
-    string qualifierText = nodeContainer.Qualifier.GetText();
-    string signText = nodeContainer.Sign.GetText();
+    string qualifierText = accessExpression.Qualifier.GetText();
+    string signText = accessExpression.Sign.GetText();
 
     // Extract settings
     var settings = m_context.BasicContext.ContextBoundSettingsStore;
@@ -157,10 +159,6 @@ public class MyLookupItemBase : TextLookupItemBase {
     var sb = new StringBuilder();
     for (int i = 0; i < suitableFields.Count; ++i) {
       var field = suitableFields[i];
-
-      if (i != 0) {
-        sb.Append(indentText);
-      }
       
       sb.Append(qualifierText);
         
@@ -175,6 +173,7 @@ public class MyLookupItemBase : TextLookupItemBase {
       if (spaceAroundAssignment) sb.Append(' ');
         
       sb.Append(";\n");
+      sb.Append(indentText);
     }
 
     var text = sb.ToString();
@@ -192,9 +191,26 @@ public class MyLookupItemBase : TextLookupItemBase {
     finally {
       Text = string.Empty;
     }
-    
-    
-    
+  }
+
+  private void Test0(ITextControl textControl, DocumentRange nameRange, LookupItemInsertType insertType, Suffix suffix, ISolution solution, bool keepCaretStill) {
+    var node = GetNodeUnderCaret();
+    if (node is null) {
+      TcpLogger.SLog("node is null");
+      return;
+    }
+
+    // Filter context (expression)
+    if (node.GetContainingNode<ICppExpressionNode>() is null) {
+      TcpLogger.SLog("Not inside ICppExpressionNode");
+      return;
+    }
+
+    var nodeContainer = node.GetContainingNode<MemberAccessExpression>();
+    if (nodeContainer is null) {
+      TcpLogger.SLog("nodeContainer is null");
+      return;
+    }
     
     // Start
     TcpLogger.SLog($"Caret offset: {m_context.BasicContext.CaretTreeOffset}");
@@ -252,12 +268,10 @@ public class FieldAssignmentCompletionProvider : ItemsProviderOfSpecificContext<
 
   protected override bool AddLookupItems(CppCodeCompletionContext context, IItemsCollector collector) {
     collector.Add(new MyLookupItemBase(context));
-    return true;
+    return base.AddLookupItems(context, collector);
   }
   
   public override EvaluationMode SupportedEvaluationMode => EvaluationMode.Light;
-  protected override LookupFocusBehaviour GetLookupFocusBehaviour(CppCodeCompletionContext context) {
-    //return base.GetLookupFocusBehaviour(context);
-    return LookupFocusBehaviour.Soft;
-  }
+  public override CompletionMode SupportedCompletionMode => CompletionMode.Single;
+  protected override LookupFocusBehaviour GetLookupFocusBehaviour(CppCodeCompletionContext context) => LookupFocusBehaviour.Soft;
 }

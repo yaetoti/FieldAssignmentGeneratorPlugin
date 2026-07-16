@@ -1,10 +1,7 @@
 import groovy.ant.FileNameFinder
 import org.apache.tools.ant.taskdefs.condition.Os
-import org.gradle.api.internal.artifacts.transform.UnzipTransform
-import org.jetbrains.intellij.platform.gradle.Constants
 import org.jetbrains.intellij.platform.gradle.utils.asPath
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import java.time.LocalTime
 
 plugins {
     id("java")
@@ -28,7 +25,7 @@ val PublishToken: String by project
 allprojects {
     repositories {
         maven { setUrl("https://cache-redirector.jetbrains.com/maven-central") }
-        // Needed for the rider model
+        // TODO Needed (?) for the rider model
         maven { setUrl("https://cache-redirector.jetbrains.com/intellij-repository/releases") }
         maven { setUrl("https://cache-redirector.jetbrains.com/intellij-repository/snapshots") }
     }
@@ -49,9 +46,6 @@ tasks.wrapper {
 
 version = extra["PluginVersion"] as String
 
-// TODO Debug
-println("Build Directory: ${layout.buildDirectory.get().asPath}")
-
 tasks.processResources {
     from("dependencies.json") { into("META-INF") }
 }
@@ -64,41 +58,40 @@ sourceSets {
     }
 }
 
-// Unzipper
-//@CacheableTransform
-//abstract class RiderRdTransform : TransformAction<TransformParameters.None> {
-//    @get:Inject
-//    abstract val archives: ArchiveOperations
-//
-//    @get:Inject
-//    abstract val fs: FileSystemOperations
-//
-//    @get:InputArtifact
-//    @get:PathSensitive(PathSensitivity.NONE)
-//    abstract val inputArtifact: Provider<FileSystemLocation>
-//
-//    override fun transform(outputs: TransformOutputs) {
-//        val input = inputArtifact.get().asFile
-//        val outputDir = outputs.dir(input.nameWithoutExtension)
-//
-//        fs.copy {
-//            includeEmptyDirs = false
-//            from(archives.zipTree(input))
-//            into(outputDir)
-//        }
-//    }
-//}
+dependencies {
+    intellijPlatform {
+        clion(ProductVersion)
+        jetbrainsRuntime()
 
-//dependencies.registerTransform(RiderRdTransform::class) {
-//    from.attribute(
-//        ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE,
-//        ArtifactTypeDefinition.ZIP_TYPE
-//    )
-//    to.attribute(
-//        ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE,
-//        ArtifactTypeDefinition.DIRECTORY_TYPE
-//    )
-//}
+        bundledPlugin("com.intellij.clion")
+        bundledPlugin("org.jetbrains.plugins.clion.radler")
+    }
+}
+
+// TODO Debug
+println("Build Directory: ${layout.buildDirectory.get().asPath}")
+println("Project Directory: ${layout.projectDirectory}")
+println("Platform Directory: ${intellijPlatform.platformPath}")
+
+val generatePlatformDirectoryProp by tasks.registering {
+    val generatedFile = layout.projectDirectory.file("src\\dotnet\\PlatformDirectory.Generated.props")
+    outputs.file(generatedFile)
+
+    doLast {
+        val path = intellijPlatform.platformPath
+        logger.lifecycle("Writing Platform Path to \"${generatedFile.asPath}\"")
+
+        generatedFile.asFile.writeText(
+            """
+            <Project>
+              <PropertyGroup>
+                <PlatformDirectory>$path</PlatformDirectory>
+              </PropertyGroup>
+            </Project>
+            """.trimIndent()
+        )
+    }
+}
 
 // A model artifact separate from rider
 val riderModelSource: Configuration by configurations.creating {
@@ -110,7 +103,6 @@ val riderModelSource: Configuration by configurations.creating {
 dependencies {
     riderModelSource("com.jetbrains.intellij.rider:riderRD:2026.1.4@zip")
 }
-
 
 val extractedRiderModelJar = layout.buildDirectory.file("riderModel/rider-model.jar")
 
@@ -148,165 +140,6 @@ artifacts {
     }
 }
 
-
-//val riderModelJar = layout.buildDirectory.file("riderModel/rider-model.jar")
-
-//artifacts {
-//    add(riderModel.name, provider {
-//        println("Vibe Check")
-//        println("Default Time: ${LocalTime.now()}")
-//        val riderRdDir = riderModelSource.singleFile
-//        println("Got file")
-//        println("Default Time: ${LocalTime.now()}")
-//        val riderModelJar = riderRdDir.resolve("lib/rd/rider-model.jar")
-//        println("Resolved")
-//        println("Default Time: ${LocalTime.now()}")
-//
-//        check(riderRdDir.isDirectory) {
-//            "Expected transformed riderRD artifact to be a directory, got: $riderRdDir"
-//        }
-//
-//        check(riderModelJar.isFile) {
-//            "Expected rider model jar at '$riderModelJar', but it does not exist"
-//        }
-//
-//        println("Vibe Checked 🤩🥰")
-//
-//        riderModelJar
-//    }) {
-//        type = "jar"
-//        extension = "jar"
-//        classifier = "rider-model"
-//    }
-//}
-
-dependencies {
-    intellijPlatform {
-        clion(ProductVersion)
-        jetbrainsRuntime()
-
-        bundledPlugin("com.intellij.clion")
-        bundledPlugin("org.jetbrains.plugins.clion.radler")
-
-
-
-        // TODO: add plugins
-        // bundledPlugin("uml")
-        // bundledPlugin("com.jetbrains.ChooseRuntime:1.0.9")
-    }
-}
-
-
-//val riderModelJar = layout.buildDirectory.file("riderModel/rider-model.jar")
-//
-//val extractRiderModelJar by tasks.registering(Copy::class) {
-//    println("Vibe Check")
-//    val riderRdZip = riderModelSource.elements.map { elements ->
-//        elements.single().asFile
-//    }
-//
-//    println("Got file")
-//
-//    from(riderRdZip.map { zipFile ->
-//        zipTree(zipFile).matching {
-//            include("lib/rd/rider-model.jar")
-//        }
-//    })
-//
-//    println("Resolved")
-//
-//    into(layout.buildDirectory.dir("riderModel"))
-//    eachFile {
-//        path = "rider-model.jar"
-//    }
-//    includeEmptyDirs = false
-//
-//    println("Vibe Checked 🥰🤩")
-//}
-//
-//artifacts {
-//    add(riderModel.name, riderModelJar) {
-//        type = "jar"
-//        extension = "jar"
-//        classifier = "rider-model"
-//        builtBy(extractRiderModelJar)
-//    }
-//}
-
-
-
-
-
-//val extractRiderModelJar by tasks.registering(Copy::class) {
-//    from(riderModelSource.map { riderRdDirs ->
-//        val riderRdDir = riderRdDirs
-//        val riderModelJar = riderRdDir.resolve("lib/rd/rider-model.jar")
-//
-//        check(riderRdDir.isDirectory) {
-//            "Expected transformed riderRD artifact to be a directory, got: $riderRdDir"
-//        }
-//
-//        check(riderModelJar.isFile) {
-//            "Expected rider model jar at '$riderModelJar', but it does not exist"
-//        }
-//
-//        riderModelJar
-//    })
-//
-//    into(layout.buildDirectory.dir("riderModel"))
-//    rename { "rider-model.jar" }
-//}
-//
-//artifacts {
-//    add(riderModel.name, riderModelJar) {
-//        type = "jar"
-//        extension = "jar"
-//        classifier = "rider-model"
-//        builtBy(extractRiderModelJar)
-//    }
-//}
-
-
-
-
-
-//// A model artifact separate from rider
-//val riderModelSource: Configuration by configurations.creating {
-//    isCanBeConsumed = false
-//    isCanBeResolved = true
-//    isTransitive = false
-//}
-//
-//dependencies {
-//    riderModelSource("com.jetbrains.intellij.rider:riderRD:2026.1.4")
-//    // TODO Seems like it uses riderRD, not rider model generated
-//    //riderModelSource("com.jetbrains.intellij.rider:rider-model-generated:$RiderModelVersion")
-//}
-//
-//val riderModel: Configuration by configurations.creating {
-//    isCanBeConsumed = true
-//    isCanBeResolved = false
-//}
-//
-//artifacts {
-//    add(riderModel.name, provider {
-//        println("=== Files in riderModelSource ===")
-//        riderModelSource.files.forEach { println(it.name) }
-//        println("================================")
-//        println("Count: ${riderModelSource.files.size}")
-//
-//        riderModelSource.singleFile.also {
-//            check(it.isFile) {
-//                "Rider model artifact is not resolved from configuration '$riderModelSource'. Check RiderModelVersion=$RiderModelVersion and IntelliJ repositories."
-//            }
-//        }
-//    }) {
-//        builtBy(Constants.Tasks.INITIALIZE_INTELLIJ_PLATFORM_PLUGIN)
-//    }
-//}
-
-// Tasks
-
 tasks.compileKotlin {
     compilerOptions { jvmTarget.set(JvmTarget.JVM_21) }
 }
@@ -340,6 +173,7 @@ val setBuildTool by tasks.registering {
 
 val compileDotNet by tasks.registering {
     dependsOn(setBuildTool)
+    dependsOn(generatePlatformDirectoryProp)
     doLast {
         val executable: String by setBuildTool.get().extra
         val arguments = (setBuildTool.get().extra["args"] as List<String>).toMutableList()
@@ -363,6 +197,7 @@ val testDotNet by tasks.registering {
 }
 
 tasks.buildPlugin {
+    dependsOn(generatePlatformDirectoryProp)
     doLast {
         copy {
             from("${layout.buildDirectory}/distributions/${rootProject.name}-${version}.zip")

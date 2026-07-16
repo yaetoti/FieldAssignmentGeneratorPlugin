@@ -1,13 +1,38 @@
 <idea-plugin require-restart="true">
   <id>com.jetbrains.rider.plugins.fieldassignmentgenerator</id>
-  <name>FieldAssignmentGenerator</name>
+  <name>Field Assignment Generator</name>
   <version>_PLACEHOLDER_</version>
-  <vendor url="https://project-url">Author</vendor>
+  <vendor url="https://project-url">yaetoti</vendor>
   <idea-version since-build="_PLACEHOLDER_" until-build="_PLACEHOLDER_" />
 
   <description>
-    <![CDATA[
-<p>Sample description teeeeeeeeeeeeeeeeeeeeeeeeest</p>
+<![CDATA[
+<p>Generates field assignments for C++ structs and classes from code completion.</p>
+<p><b>Alpha version</b>. Expect occasional bugs and unsupported language constructs while the plugin is being actively developed. Feedback and bug reports are welcome.</p>
+
+<h3>Example</h3>
+
+<pre><code>
+DXGI_ADAPTER_DESC desc;
+desc.
+</code></pre>
+
+<p>↓</p>
+
+<pre><code>
+desc.Description = ;
+desc.VendorId = ;
+desc.DeviceId = ;
+desc.SubSysId = ;
+...
+</code></pre>
+
+<h3>Features</h3>
+<ul>
+  <li>Supports <code>.</code> and <code>-></code></li>
+  <li>Respects CLion formatting settings</li>
+  <li>Editable hotspots for quick value entry</li>
+</ul>
 ]]>
   </description>
 
@@ -16,11 +41,6 @@
   <depends>com.intellij.modules.jetbrains</depends>
   <depends>com.intellij.modules.platform</depends>
   <depends>com.intellij.modules.lang</depends>
-
-<!--  TODO remove-->
-<!--  <extensions defaultExtensionNs="com.intellij">-->
-<!--    <completion.contributor language="any" implementationClass="com.yaetoti.FieldAssignmentCompletionContributor"/>-->
-<!--  </extensions>-->
 
   <actions>
     <action id="com.example.yourplugin.MyAction"

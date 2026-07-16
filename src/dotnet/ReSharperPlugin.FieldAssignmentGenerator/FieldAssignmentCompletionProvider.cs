@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 using System.Text;
 using JetBrains.Annotations;
 using JetBrains.DocumentModel;
@@ -21,7 +20,6 @@ using JetBrains.ReSharper.Feature.Services.LiveTemplates.Hotspots;
 using JetBrains.ReSharper.Feature.Services.LiveTemplates.LiveTemplates;
 using JetBrains.ReSharper.Feature.Services.LiveTemplates.Templates;
 using JetBrains.ReSharper.Feature.Services.Resources;
-using JetBrains.ReSharper.Psi.CodeStyle;
 using JetBrains.ReSharper.Psi.Cpp.Expressions;
 using JetBrains.ReSharper.Psi.Cpp.Resolve;
 using JetBrains.ReSharper.Psi.Format;
@@ -97,9 +95,9 @@ public class MyLookupItemBase : TextLookupItemBase {
       TcpLogger.SLog("node is null");
       return;
     }
-
+    
     // Filter context (expression)
-    if (node.GetContainingNode<ICppExpressionNode>() is null) {
+    if (node.GetContainingNode<ExpressionStatement>() is null) {
       TcpLogger.SLog("Not inside ICppExpressionNode");
       return;
     }

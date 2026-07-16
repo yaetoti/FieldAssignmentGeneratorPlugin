@@ -14,7 +14,11 @@ output
 *.cache
 
 # IDEs
-.idea/
+# IDEs
+.idea/*.iml
+.idea/*.xml
+.idea/.idea.*/*.iml
+.idea/.idea.*/.idea/*.xml
 .kotlin/
 .vs
 _ReSharper*

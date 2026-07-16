@@ -13,30 +13,6 @@ using JetBrains.Util;
 namespace ReSharperPlugin.FieldAssignmentGenerator;
 
 [SolutionComponent(Instantiation.ContainerAsyncPrimaryThread)]
-public class MyTestFrameworkBackendExt2 {
-  public MyTestFrameworkBackendExt2(Lifetime lifetime, ILogger logger, ISolution solution, IShellLocks locks, MyPluginModel model) {
-    new MyLogger().Log("Ext2 started").Dump("2_Init.txt");
-    if (model == null) {
-      new MyLogger().Log("no model").Dump("2_Error.txt");
-    }
-    
-    new MyLogger().Log($"{model}").Dump("3_Model.txt");
-    
-    model.GetTestExecutionCommand.SetSync((line) => {
-      var l = new MyLogger();
-      l.Log("Was called");
-      l.Dump("2_Log.txt");
-      
-      using (locks.UsingReadLock()) {
-
-      }
-      
-      return "aaa";
-    });
-  }
-}
-
-[SolutionComponent(Instantiation.ContainerAsyncPrimaryThread)]
 public class MyTestFrameworkBackendExt {
   private static String CONTENT = "";
 

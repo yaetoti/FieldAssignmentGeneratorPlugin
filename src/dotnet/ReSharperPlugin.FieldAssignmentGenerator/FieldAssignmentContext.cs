@@ -50,8 +50,7 @@ class FieldAssignmentContext {
     }
 
     var cppType = resolveEntity.GetCppType();
-    var classResolveEntity = cppType.InternalAs<ICppClassResolveEntity>();
-    if (classResolveEntity is null) {
+    if (cppType.InternalType is not ICppClassResolveEntity classResolveEntity) {
       //TcpLogger.SLog("Internal type is null");
       return null;
     }

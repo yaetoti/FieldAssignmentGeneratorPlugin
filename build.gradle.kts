@@ -142,7 +142,7 @@ artifacts {
 
 tasks.compileKotlin {
     dependsOn(extractRiderModelJar)
-    compilerOptions { jvmTarget.set(JvmTarget.JVM_21) }
+    compilerOptions { jvmTarget.set(JvmTarget.JVM_25) }
 }
 
 val setBuildTool by tasks.registering {

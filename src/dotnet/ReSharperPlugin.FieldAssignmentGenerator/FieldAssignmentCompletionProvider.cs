@@ -1,4 +1,5 @@
-﻿using DefaultNamespace;
+﻿using System.Diagnostics;
+using DefaultNamespace;
 using JetBrains.ReSharper.Feature.Services.Lookup;
 using JetBrains.ReSharper.Psi.Cpp.Tree;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion;
@@ -20,19 +21,23 @@ public class FieldAssignmentCompletionProvider : ItemsProviderOfSpecificContext<
     if (context.BasicContext.CodeCompletionType != CodeCompletionType.BasicCompletion && context.BasicContext.CodeCompletionType != CodeCompletionType.SmartCompletion) {
       return false;
     }
-
-    var ctx = FieldAssignmentContext.Create(context);
-    if (ctx is null) {
-      TcpLogger.SLog("Heavy fail");
-      return false;
-    }
     
     return true;
   }
 
   protected override bool AddLookupItems(CppCodeCompletionContext context, IItemsCollector collector) {
-    TcpLogger.SLog("AddLookupItems");
+    //var sw = Stopwatch.StartNew();
+    var ctx = FieldAssignmentContext.Create(context);
+    if (ctx is null) {
+      //TcpLogger.SLog("Heavy fail");
+      return base.AddLookupItems(context, collector);
+    }
+    
+    //TcpLogger.SLog("AddLookupItems");
     collector.Add(new FieldAssignmentLookupItem(context));
+    
+    //sw.Stop();
+    //TcpLogger.SLog(sw.ElapsedMilliseconds.ToString());
     return base.AddLookupItems(context, collector);
   }
   

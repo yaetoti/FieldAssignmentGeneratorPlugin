@@ -65,7 +65,7 @@ public class FieldAssignmentLookupItem : TextLookupItemBase {
         }
         
         suitableFields.Add(variable.Name.ToString());
-        TcpLogger.SLog($"Good variable: {variable.Name}");
+        //TcpLogger.SLog($"Good variable: {variable.Name}");
       }
     }
 
@@ -81,7 +81,7 @@ public class FieldAssignmentLookupItem : TextLookupItemBase {
     // Find suitable fields
     var suitableFields = GetSuitableFields(ctx);
     if (suitableFields.Count == 0) {
-      TcpLogger.SLog($"No suitable fields");
+      //TcpLogger.SLog($"No suitable fields");
       return;
     }
     
@@ -102,9 +102,9 @@ public class FieldAssignmentLookupItem : TextLookupItemBase {
     
     var indentText = DocumentIndentUtils.GetLineIndent(document, new DocumentOffset(document, start).ToDocumentCoords().Line);
     
-    TcpLogger.SLog($"QualifierText: {qualifierText}");
-    TcpLogger.SLog($"SignText: {signText}");
-    TcpLogger.SLog($"Range: {start} - {end}");
+    //TcpLogger.SLog($"QualifierText: {qualifierText}");
+    //TcpLogger.SLog($"SignText: {signText}");
+    //TcpLogger.SLog($"Range: {start} - {end}");
     
     // Build text
     var hotspotOffsets = new List<int>();

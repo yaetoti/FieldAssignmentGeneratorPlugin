@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="_Слой_1" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 30 23">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: url(#_Безымянный_градиент_1144);
+      }
+
+      .cls-2 {
+        fill: url(#_Безымянный_градиент_1144-2);
+      }
+    </style>
+    <linearGradient id="_Безымянный_градиент_1144" data-name="Безымянный градиент 1144" x1="9.9" y1="9.55" x2="20.1" y2="27.23" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#d42aff"/>
+      <stop offset=".18" stop-color="#d02bfe"/>
+      <stop offset=".32" stop-color="#c62efa"/>
+      <stop offset=".45" stop-color="#b534f5"/>
+      <stop offset=".57" stop-color="#9d3dee"/>
+      <stop offset=".68" stop-color="#7e48e4"/>
+      <stop offset=".8" stop-color="#5855d9"/>
+      <stop offset=".91" stop-color="#2c65cb"/>
+      <stop offset="1" stop-color="#0075be"/>
+    </linearGradient>
+    <linearGradient id="_Безымянный_градиент_1144-2" data-name="Безымянный градиент 1144" x1="9.9" y1="-4.23" x2="20.1" y2="13.45" xlink:href="#_Безымянный_градиент_1144"/>
+  </defs>
+  <path class="cls-1" d="m26.5,15.79c.83,0,1.5.67,1.5,1.5v2.21c0,.83-.67,1.5-1.5,1.5H3.5c-.83,0-1.5-.67-1.5-1.5v-2.21c0-.83.67-1.5,1.5-1.5h23m0-2H3.5c-1.93,0-3.5,1.57-3.5,3.5v2.21c0,1.93,1.57,3.5,3.5,3.5h23c1.93,0,3.5-1.57,3.5-3.5v-2.21c0-1.93-1.57-3.5-3.5-3.5h0Z"/>
+  <path class="cls-2" d="m26.5,2c.83,0,1.5.67,1.5,1.5v2.21c0,.83-.67,1.5-1.5,1.5H3.5c-.83,0-1.5-.67-1.5-1.5v-2.21c0-.83.67-1.5,1.5-1.5h23m0-2H3.5C1.57,0,0,1.57,0,3.5v2.21c0,1.93,1.57,3.5,3.5,3.5h23c1.93,0,3.5-1.57,3.5-3.5v-2.21c0-1.93-1.57-3.5-3.5-3.5h0Z"/>
+</svg>

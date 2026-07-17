@@ -32,18 +32,6 @@
     <Reference Include="JetBrains.ReSharper.Feature.Services.Cpp">
       <HintPath>$(PlatformDirectory)\plugins\clion-radler\DotFiles\JetBrains.ReSharper.Feature.Services.Cpp.dll</HintPath>
     </Reference>
-    
-<!--    <Reference Include="JetBrains.ReSharper.Cpp">-->
-<!--      <HintPath>E:\GradleCache\caches\9.0.0\transforms\93b28b8c8a6a6d17b587b7896d27659f\transformed\CLion-2026.1-win\plugins\clion-radler\DotFiles\JetBrains.ReSharper.Cpp.dll</HintPath>-->
-<!--    </Reference>-->
-<!--    -->
-<!--    <Reference Include="JetBrains.ReSharper.Feature.Services.Cpp">-->
-<!--      <HintPath>E:\GradleCache\caches\9.0.0\transforms\93b28b8c8a6a6d17b587b7896d27659f\transformed\CLion-2026.1-win\plugins\clion-radler\DotFiles\JetBrains.ReSharper.Feature.Services.Cpp.dll</HintPath>-->
-<!--    </Reference>-->
-<!--    -->
-<!--    <Reference Include="JetBrains.ReSharper.Feature.Services">-->
-<!--      <HintPath>E:\GradleCache\caches\9.0.0\transforms\93b28b8c8a6a6d17b587b7896d27659f\transformed\CLion-2026.1-win\plugins\clion-radler\DotFiles\JetBrains.ReSharper.Feature.Services.Cpp.dll</HintPath>-->
-<!--    </Reference>-->
   </ItemGroup>
 
 </Project>

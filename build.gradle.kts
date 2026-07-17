@@ -141,6 +141,7 @@ artifacts {
 }
 
 tasks.compileKotlin {
+    dependsOn(extractRiderModelJar)
     compilerOptions { jvmTarget.set(JvmTarget.JVM_21) }
 }
 

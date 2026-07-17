@@ -1,5 +1,5 @@
 <idea-plugin require-restart="true">
-  <id>com.jetbrains.rider.plugins.fieldassignmentgenerator</id>
+  <id>com.yaetoti.fieldassignmentgenerator</id>
   <name>Field Assignment Generator</name>
   <version>_PLACEHOLDER_</version>
   <vendor url="https://github.com/yaetoti/FieldAssignmentGeneratorPlugin">yaetoti</vendor>

@@ -1,13 +1,12 @@
-﻿using System.Diagnostics;
-using DefaultNamespace;
+﻿using DefaultNamespace;
 using JetBrains.ReSharper.Feature.Services.Lookup;
 using JetBrains.ReSharper.Psi.Cpp.Tree;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure;
-using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Cpp.Language;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems;
 using JetBrains.ReSharper.Feature.Services.Cpp.CodeCompletion;
+using JetBrains.ReSharper.Psi;
 
 namespace ReSharperPlugin.FieldAssignmentGenerator;
 
@@ -22,22 +21,19 @@ public class FieldAssignmentCompletionProvider : ItemsProviderOfSpecificContext<
       return false;
     }
     
+    var ctx = FieldAssignmentContext.Create(context);
+    if (ctx is null) {
+      //TcpLogger.SLog("Heavy fail");
+      return false;
+    }
+    
     return true;
   }
 
   protected override bool AddLookupItems(CppCodeCompletionContext context, IItemsCollector collector) {
-    //var sw = Stopwatch.StartNew();
-    var ctx = FieldAssignmentContext.Create(context);
-    if (ctx is null) {
-      //TcpLogger.SLog("Heavy fail");
-      return base.AddLookupItems(context, collector);
-    }
-    
     //TcpLogger.SLog("AddLookupItems");
     collector.Add(new FieldAssignmentLookupItem(context));
     
-    //sw.Stop();
-    //TcpLogger.SLog(sw.ElapsedMilliseconds.ToString());
     return base.AddLookupItems(context, collector);
   }
   

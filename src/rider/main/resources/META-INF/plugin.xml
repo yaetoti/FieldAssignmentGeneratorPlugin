@@ -2,14 +2,17 @@
   <id>com.jetbrains.rider.plugins.fieldassignmentgenerator</id>
   <name>Field Assignment Generator</name>
   <version>_PLACEHOLDER_</version>
-  <vendor url="https://project-url">yaetoti</vendor>
+  <vendor url="https://github.com/yaetoti/FieldAssignmentGeneratorPlugin">yaetoti</vendor>
   <idea-version since-build="261" />
 
   <description>
 <![CDATA[
 <p>Generates field assignments for C++ structs and classes from code completion.</p>
-<p><b>Alpha version</b>: Expect occasional bugs and unsupported language constructs while the plugin is being actively developed. Feedback and bug reports are welcome.</p>
+<p><b>Alpha version</b>: Expect occasional bugs and unsupported language constructs while the plugin is being actively developed. Found bug? .</p>
 <p><b>Experimental</b>: This plugin uses a custom build configuration and internal CLion Nova APIs because an official plugin template is not yet available.</p>
+
+<p>Found a bug or have a feature request? Please report it on the <a href="https://github.com/yaetoti/FieldAssignmentGeneratorPlugin/issues">GitHub Issues page</a>.<p>
+
 
 <h3>Example</h3>
 

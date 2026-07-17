@@ -11,7 +11,8 @@ using JetBrains.Util;
 
 namespace ReSharperPlugin.FieldAssignmentGenerator;
 
-// Stolen from CppCompleteDesignatedInitializationItemsProvider
+// References
+// CppCompleteDesignatedInitializationItemsProvider
 internal class HotspotExpressionBase : IHotspotExpression {
   public string EvaluateQuickResult(IHotspotContext context) => "";
   public HotspotItems GetLookupItems(IHotspotContext context) => HotspotItems.Empty;

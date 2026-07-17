@@ -7,7 +7,7 @@ plugins {
     id("java")
     alias(libs.plugins.kotlinJvm)
     // See https://github.com/JetBrains/intellij-platform-gradle-plugin/releases
-    id("org.jetbrains.intellij.platform") version "2.17.0"
+    id("org.jetbrains.intellij.platform") version "2.18.0"
     id("me.filippov.gradle.jvm.wrapper") version "0.14.0"
 }
 
@@ -179,11 +179,12 @@ val compileDotNet by tasks.registering {
         val executable: String by setBuildTool.get().extra
         val arguments = (setBuildTool.get().extra["args"] as List<String>).toMutableList()
         arguments.add("/t:Restore;Rebuild")
-        providers.exec {
+        var result = providers.exec {
             executable(executable)
             args(arguments)
             workingDir(rootDir)
         }
+        println(result.standardOutput.asText.get())
     }
 }
 

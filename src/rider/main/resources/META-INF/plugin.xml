@@ -3,7 +3,7 @@
   <name>Field Assignment Generator</name>
   <version>_PLACEHOLDER_</version>
   <vendor url="https://github.com/yaetoti/FieldAssignmentGeneratorPlugin">yaetoti</vendor>
-  <idea-version since-build="261" />
+  <idea-version since-build="262" />
 
   <description>
 <![CDATA[
@@ -41,7 +41,6 @@ desc.SubSysId = ;
 <h3>In development</h3>
 <ul>
   <li>Configuration</li>
-  <li>Pointer support</li>
   <li>Customizable completion display order</li>
   <li>Generating assignments for inherited fields (optional)</li>
   <li>Generating assignments for fields that are private or protected but could be accessed from the completion context (optional)</li>

@@ -1,5 +1,4 @@
-﻿using DefaultNamespace;
-using JetBrains.ReSharper.Feature.Services.Lookup;
+﻿using JetBrains.ReSharper.Feature.Services.Lookup;
 using JetBrains.ReSharper.Psi.Cpp.Tree;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure;

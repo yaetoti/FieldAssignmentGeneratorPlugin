@@ -9,9 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="JetBrains.Platform.VisualStudio.Core" Version="261.0.20260329.210200" />
-    <PackageReference Include="JetBrains.Psi.Features.Cpp.Src.Core" Version="261.0.20260329.210200" />
     <PackageReference Include="JetBrains.Rider.SDK" Version="$(SdkVersion)" />
+    <PackageReference Include="JetBrains.ReSharper.SDK" Version="$(SdkVersion)" />
   </ItemGroup>
 
 </Project>

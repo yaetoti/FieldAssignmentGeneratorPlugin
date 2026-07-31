@@ -3,7 +3,7 @@
   <PropertyGroup>
     <!-- See https://www.nuget.org/packages/JetBrains.ReSharper.SDK -->
     <!-- Keep in sync with ProductVersion in gradle.properties -->
-    <SdkVersion>2026.1</SdkVersion>
+    <SdkVersion>2026.2</SdkVersion>
 
     <Title>Field Assignment Generator</Title>
     <Description>Field Assignment Generator plugin generates field assignments for C++ structs and classes from code completion</Description>

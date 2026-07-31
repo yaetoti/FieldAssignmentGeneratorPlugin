@@ -73,26 +73,6 @@ println("Build Directory: ${layout.buildDirectory.get().asPath}")
 println("Project Directory: ${layout.projectDirectory}")
 println("Platform Directory: ${intellijPlatform.platformPath}")
 
-val generatePlatformDirectoryProp by tasks.registering {
-    val generatedFile = layout.projectDirectory.file("src\\dotnet\\PlatformDirectory.Generated.props")
-    outputs.file(generatedFile)
-
-    doLast {
-        val path = intellijPlatform.platformPath
-        logger.lifecycle("Writing Platform Path to \"${generatedFile.asPath}\"")
-
-        generatedFile.asFile.writeText(
-            """
-            <Project>
-              <PropertyGroup>
-                <PlatformDirectory>$path</PlatformDirectory>
-              </PropertyGroup>
-            </Project>
-            """.trimIndent()
-        )
-    }
-}
-
 // A model artifact separate from rider
 val riderModelSource: Configuration by configurations.creating {
     isCanBeConsumed = false
@@ -174,7 +154,6 @@ val setBuildTool by tasks.registering {
 
 val compileDotNet by tasks.registering {
     dependsOn(setBuildTool)
-    dependsOn(generatePlatformDirectoryProp)
     doLast {
         val executable: String by setBuildTool.get().extra
         val arguments = (setBuildTool.get().extra["args"] as List<String>).toMutableList()
@@ -199,7 +178,6 @@ val testDotNet by tasks.registering {
 }
 
 tasks.buildPlugin {
-    dependsOn(generatePlatformDirectoryProp)
     doLast {
         copy {
             from("${layout.buildDirectory}/distributions/${rootProject.name}-${version}.zip")

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Text;
-using DefaultNamespace;
 using JetBrains.DocumentModel;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure;
@@ -101,10 +100,6 @@ public class FieldAssignmentLookupItem : TextLookupItemBase {
     var spaceAroundDot = settings.GetValue<CppFormattingSettingsKey, bool>(key => key.SPACE_AROUND_DOT);
     
     var indentText = DocumentIndentUtils.GetLineIndent(document, new DocumentOffset(document, start).ToDocumentCoords().Line);
-    
-    //TcpLogger.SLog($"QualifierText: {qualifierText}");
-    //TcpLogger.SLog($"SignText: {signText}");
-    //TcpLogger.SLog($"Range: {start} - {end}");
     
     // Build text
     var hotspotOffsets = new List<int>();

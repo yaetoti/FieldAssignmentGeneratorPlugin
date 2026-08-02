@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using System.Collections.Generic;
+using JetBrains.Annotations;
 using JetBrains.ReSharper.Feature.Services.Cpp.CodeCompletion;
 using JetBrains.ReSharper.Psi.Cpp.Symbols;
 using JetBrains.ReSharper.Psi.Cpp.Tree;
@@ -16,28 +17,30 @@ class FieldAssignmentContext {
   public MemberAccessExpression accessExpression;
   public ICppClassResolveEntity classResolveEntity;
 
-  private static ICppClassResolveEntity ResolveQualifierClass(MemberAccessExpression memAccess) {
-    // Resolve pointers
-    if (memAccess.GetLookupScopeResolveResult().GetPrimaryEntity() is ICppDeclaratorResolveEntity resolvedEntity) {
-      if (resolvedEntity.GetCppType().InternalType is CppFunctionType functionType) {
-        if (functionType.ReturnType.InternalType is ICppClassResolveEntity classResolveEntity) {
-          return classResolveEntity;
+  public List<string> GetSuitableFields() {
+    var suitableFields = new List<string>();
+    foreach (var classChild in classResolveEntity.GetChildren()) {
+      if (classChild is not CppDeclaratorResolveEntityPack classChildPack) {
+        continue;
+      }
+      
+      foreach (var variable in classChildPack.GetGroupedVariables()) {
+        // Filter non-static fields
+        if (!variable.IsNonStaticField()) {
+          continue;
         }
+
+        // TODO check relative accessibility
+        // Filter accessibility
+        if (variable.GetAccessibility() != CppAccessibility.PUBLIC) {
+          continue;
+        }
+        
+        suitableFields.Add(variable.Name.ToString());
       }
     }
-    
-    // Resolve references and values
-    if (memAccess.GetResolvedLeftArgument() is not ICppExpressionNode resolvedLeftArgument) {
-      return null;
-    }
-    
-    CppTypeAndCategory typeAndCategory = resolvedLeftArgument.GetTypeAndCategory();
-    if (typeAndCategory.Category != CppValueCategory.L_VALUE) {
-      return null;
-    }
-    
-    CppQualType t = typeAndCategory.Type;
-    return t.InternalAs<ICppClassResolveEntity>();
+
+    return suitableFields;
   }
   
   [CanBeNull]
@@ -78,5 +81,30 @@ class FieldAssignmentContext {
     result.accessExpression = accessExpression;
     result.classResolveEntity = classResolveEntity;
     return result;
+  }
+  
+  
+  private static ICppClassResolveEntity ResolveQualifierClass(MemberAccessExpression memAccess) {
+    // Resolve pointers
+    if (memAccess.GetLookupScopeResolveResult().GetPrimaryEntity() is ICppDeclaratorResolveEntity resolvedEntity) {
+      if (resolvedEntity.GetCppType().InternalType is CppFunctionType functionType) {
+        if (functionType.ReturnType.InternalType is ICppClassResolveEntity classResolveEntity) {
+          return classResolveEntity;
+        }
+      }
+    }
+    
+    // Resolve references and values
+    if (memAccess.GetResolvedLeftArgument() is not ICppExpressionNode resolvedLeftArgument) {
+      return null;
+    }
+    
+    CppTypeAndCategory typeAndCategory = resolvedLeftArgument.GetTypeAndCategory();
+    if (typeAndCategory.Category != CppValueCategory.L_VALUE) {
+      return null;
+    }
+    
+    CppQualType t = typeAndCategory.Type;
+    return t.InternalAs<ICppClassResolveEntity>();
   }
 }

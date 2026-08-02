@@ -25,6 +25,12 @@ public class FieldAssignmentCompletionProvider : ItemsProviderOfSpecificContext<
       //TcpLogger.SLog("Heavy fail");
       return false;
     }
+
+    var suitableFields = ctx.GetSuitableFields();
+    if (suitableFields.Count == 0) {
+      //TcpLogger.SLog("Heavy fail");
+      return false;
+    }
     
     return true;
   }

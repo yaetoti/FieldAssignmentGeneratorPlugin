@@ -185,17 +185,39 @@ tasks.buildPlugin {
         }
 
         // TODO: See also org.jetbrains.changelog: https://github.com/JetBrains/gradle-changelog-plugin
+//        val changelogText = file("${rootDir}/CHANGELOG.md").readText()
+//        val changelogMatches = Regex("(?s)(-.+?)(?=##|$)").findAll(changelogText)
+//        val changeNotes = changelogMatches.map {
+//            it.groups[1]!!.value.replace("(?s)- ".toRegex(), "\u2022 ").replace("`", "").replace(",", "%2C").replace(";", "%3B")
+//        }.take(1).joinToString()
+
         val changelogText = file("${rootDir}/CHANGELOG.md").readText()
-        val changelogMatches = Regex("(?s)(-.+?)(?=##|$)").findAll(changelogText)
-        val changeNotes = changelogMatches.map {
-            it.groups[1]!!.value.replace("(?s)- ".toRegex(), "\u2022 ").replace("`", "").replace(",", "%2C").replace(";", "%3B")
-        }.take(1).joinToString()
+//        val sectionRegex = Regex(
+//            """^##\s+([^\r\n]+)\r?\n(.*?)(?=^##\s+|\z)""",
+//            setOf(RegexOption.MULTILINE, RegexOption.DOT_MATCHES_ALL)
+//        )
+//
+//        val changelogSection = sectionRegex.findAll(changelogText)
+//            .map { match -> match.groupValues[2] }
+//            .toList()
+//            .last()
+//
+//        val changeNotesText = changelogSection
+//            .lineSequence()
+//            .map { it.trim() }
+//            .filter { it.isNotEmpty() }
+//            .joinToString("\n") { line ->
+//                when {
+//                    line.startsWith("- ") -> "\u2022 ${line.removePrefix("- ")}"
+//                    else -> line
+//                }
+//            }
 
         val executable: String by setBuildTool.get().extra
         val arguments = (setBuildTool.get().extra["args"] as List<String>).toMutableList()
         arguments.add("/t:Pack")
         arguments.add("/p:PackageOutputPath=${rootDir}/output")
-        arguments.add("/p:PackageReleaseNotes=${changeNotes}")
+        arguments.add("/p:PackageReleaseNotes=${changelogText}")
         arguments.add("/p:PackageVersion=${version}")
         providers.exec {
             executable(executable)
@@ -213,11 +235,7 @@ tasks.runIde {
 tasks.patchPluginXml {
     // TODO: See also org.jetbrains.changelog: https://github.com/JetBrains/gradle-changelog-plugin
     val changelogText = file("${rootDir}/CHANGELOG.md").readText()
-    val changelogMatches = Regex("(?s)(-.+?)(?=##|\$)").findAll(changelogText)
-
-    changeNotes.set(changelogMatches.map {
-        it.groups[1]!!.value.replace("(?s)\r?\n".toRegex(), "<br />\n")
-    }.take(1).joinToString())
+    changeNotes.set(changelogText)
 }
 
 tasks.prepareSandbox {

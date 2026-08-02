@@ -1,20 +1,45 @@
 ﻿using JetBrains.Annotations;
 using JetBrains.ReSharper.Feature.Services.Cpp.CodeCompletion;
-using JetBrains.ReSharper.Feature.Services.Cpp.Tree;
 using JetBrains.ReSharper.Psi.Cpp.Symbols;
 using JetBrains.ReSharper.Psi.Cpp.Tree;
+using JetBrains.ReSharper.Psi.Cpp.Types;
 using JetBrains.ReSharper.Psi.Tree;
 
 namespace ReSharperPlugin.FieldAssignmentGenerator;
 
 // Reference:
 // CppDeclaredElementLookupItem
+// CppMemberAccessExpressionUtil
 class FieldAssignmentContext {
   public ITreeNode nodeUnderCaret;
   public ExpressionStatement expressionStatement;
   public MemberAccessExpression accessExpression;
   public ICppClassResolveEntity classResolveEntity;
 
+  private static ICppClassResolveEntity ResolveQualifierClass(MemberAccessExpression memAccess) {
+    // Resolve pointers
+    if (memAccess.GetLookupScopeResolveResult().GetPrimaryEntity() is ICppDeclaratorResolveEntity resolvedEntity) {
+      if (resolvedEntity.GetCppType().InternalType is CppFunctionType functionType) {
+        if (functionType.ReturnType.InternalType is ICppClassResolveEntity classResolveEntity) {
+          return classResolveEntity;
+        }
+      }
+    }
+    
+    // Resolve references and values
+    if (memAccess.GetResolvedLeftArgument() is not ICppExpressionNode resolvedLeftArgument) {
+      return null;
+    }
+    
+    CppTypeAndCategory typeAndCategory = resolvedLeftArgument.GetTypeAndCategory();
+    if (typeAndCategory.Category != CppValueCategory.L_VALUE) {
+      return null;
+    }
+    
+    CppQualType t = typeAndCategory.Type;
+    return t.InternalAs<ICppClassResolveEntity>();
+  }
+  
   [CanBeNull]
   public static FieldAssignmentContext Create(CppCodeCompletionContext ctx) {
     var result = new FieldAssignmentContext();
@@ -35,9 +60,8 @@ class FieldAssignmentContext {
       return null;
     }
 
-    // Allows resolving class from pointers, functions, parentheses, etc. TODO handle rvalue
-    var resolvedQualifier = accessExpression.GetResolvedClass();
-    if (resolvedQualifier is not ICppClassResolveEntity classResolveEntity) {
+    var classResolveEntity = ResolveQualifierClass(accessExpression);
+    if (classResolveEntity is null) {
       return null;
     }
     

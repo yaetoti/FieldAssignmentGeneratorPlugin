@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Text;
-using DefaultNamespace;
 using JetBrains.DocumentModel;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure;
@@ -44,33 +43,6 @@ public class FieldAssignmentLookupItem : TextLookupItemBase {
 
   public override IconId Image => ServicesThemedIcons.LiveTemplate.Id;
   protected override RichText GetDisplayName() => new RichText(NAME, new TextStyle(JetFontStyles.Italic, TextColor, new JetRgbaColor()));
-
-  private static List<string> GetSuitableFields(FieldAssignmentContext ctx) {
-    var suitableFields = new List<string>();
-    foreach (var classChild in ctx.classResolveEntity.GetChildren()) {
-      if (classChild is not CppDeclaratorResolveEntityPack classChildPack) {
-        continue;
-      }
-      
-      foreach (var variable in classChildPack.GetGroupedVariables()) {
-        // Filter non-static fields
-        if (!variable.IsNonStaticField()) {
-          continue;
-        }
-
-        // TODO check relative accessibility
-        // Filter accessibility
-        if (variable.GetAccessibility() != CppAccessibility.PUBLIC) {
-          continue;
-        }
-        
-        suitableFields.Add(variable.Name.ToString());
-        //TcpLogger.SLog($"Good variable: {variable.Name}");
-      }
-    }
-
-    return suitableFields;
-  }
   
   public override void Accept(ITextControl textControl, DocumentRange nameRange, LookupItemInsertType insertType, Suffix suffix, ISolution solution, bool keepCaretStill) {
     var ctx = FieldAssignmentContext.Create(m_context);
@@ -79,9 +51,8 @@ public class FieldAssignmentLookupItem : TextLookupItemBase {
     }
     
     // Find suitable fields
-    var suitableFields = GetSuitableFields(ctx);
+    var suitableFields = ctx.GetSuitableFields();
     if (suitableFields.Count == 0) {
-      //TcpLogger.SLog($"No suitable fields");
       return;
     }
     
@@ -101,10 +72,6 @@ public class FieldAssignmentLookupItem : TextLookupItemBase {
     var spaceAroundDot = settings.GetValue<CppFormattingSettingsKey, bool>(key => key.SPACE_AROUND_DOT);
     
     var indentText = DocumentIndentUtils.GetLineIndent(document, new DocumentOffset(document, start).ToDocumentCoords().Line);
-    
-    //TcpLogger.SLog($"QualifierText: {qualifierText}");
-    //TcpLogger.SLog($"SignText: {signText}");
-    //TcpLogger.SLog($"Range: {start} - {end}");
     
     // Build text
     var hotspotOffsets = new List<int>();

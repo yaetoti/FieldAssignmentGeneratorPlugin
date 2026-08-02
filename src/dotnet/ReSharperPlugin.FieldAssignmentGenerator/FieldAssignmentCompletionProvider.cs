@@ -1,5 +1,4 @@
-﻿using DefaultNamespace;
-using JetBrains.ReSharper.Feature.Services.Lookup;
+﻿using JetBrains.ReSharper.Feature.Services.Lookup;
 using JetBrains.ReSharper.Psi.Cpp.Tree;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure;
@@ -23,6 +22,12 @@ public class FieldAssignmentCompletionProvider : ItemsProviderOfSpecificContext<
     
     var ctx = FieldAssignmentContext.Create(context);
     if (ctx is null) {
+      //TcpLogger.SLog("Heavy fail");
+      return false;
+    }
+
+    var suitableFields = ctx.GetSuitableFields();
+    if (suitableFields.Count == 0) {
       //TcpLogger.SLog("Heavy fail");
       return false;
     }

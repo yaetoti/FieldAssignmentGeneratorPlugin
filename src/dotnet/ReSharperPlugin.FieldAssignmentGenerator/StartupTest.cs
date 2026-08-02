@@ -4,7 +4,6 @@ using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.Util;
 
-
 namespace ReSharperPlugin.FieldAssignmentGenerator;
 
 [SolutionComponent(Instantiation.ContainerAsyncPrimaryThread)]

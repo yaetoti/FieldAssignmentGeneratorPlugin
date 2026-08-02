@@ -3,13 +3,13 @@
   <name>Field Assignment Generator</name>
   <version>_PLACEHOLDER_</version>
   <vendor url="https://github.com/yaetoti/FieldAssignmentGeneratorPlugin">yaetoti</vendor>
-  <idea-version since-build="261" />
+  <idea-version since-build="262" />
 
   <description>
 <![CDATA[
 <p>Generates field assignments for C++ structs and classes from code completion.</p>
 <p><b>Alpha version</b>: Expect occasional bugs and unsupported language constructs while the plugin is being actively developed.</p>
-<p><b>Experimental</b>: This plugin uses a custom build configuration and internal CLion Nova APIs because an official plugin template is not yet available.</p>
+<p><b>Experimental</b>: This plugin uses a custom build configuration because an official plugin template is not yet available.</p>
 
 <p>Found a bug or have a feature request? Please report it on the <a href="https://github.com/yaetoti/FieldAssignmentGeneratorPlugin/issues">GitHub Issues page</a>.</p>
 
@@ -34,14 +34,14 @@ desc.SubSysId = ;
 <h3>Features</h3>
 <ul>
   <li>Generates field assignments for public fields owned by the object itself</li>
+  <li>Supports generation for values, references, pointers, array elements, RAII wrappers, values returned by the function, recognizes typedefs</li>
   <li>Respects formatting settings</li>
-  <li>Editable hotspots for quick value entry</li>
+  <li>Hotspots</li>
 </ul>
 
 <h3>In development</h3>
 <ul>
   <li>Configuration</li>
-  <li>Pointer support</li>
   <li>Customizable completion display order</li>
   <li>Generating assignments for inherited fields (optional)</li>
   <li>Generating assignments for fields that are private or protected but could be accessed from the completion context (optional)</li>

@@ -1,11 +1,12 @@
-# Changelog
-All notable changes to this project will be documented in this file.
+<strong>0.2.0-alpha</strong>
+<ul>
+    <li>Support for pointers, array elements, RAII wrappers, values returned by the function</li>
+</ul>
 
-The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
-and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
-
-## 0.1.0
-- Initial version
-- Generate field assignments
-- Supports structs/classes
-- Hotspots
+<strong>0.1.0-alpha</strong>
+<ul>
+    <li>Initial version</li>
+    <li>Field assignment generation for values</li>
+    <li>Supports structs/classes</li>
+    <li>Provides hotspots</li>
+</ul>

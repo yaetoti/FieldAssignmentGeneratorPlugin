@@ -1,6 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
-  <Import Project="..\PlatformDirectory.Generated.props" />
   
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
@@ -11,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="JetBrains.Rider.SDK" Version="$(SdkVersion)" PrivateAssets="all" />
+    <PackageReference Include="JetBrains.ReSharper.SDK" Version="$(SdkVersion)" PrivateAssets="all" />
     <PackageReference Include="Wave" Version="$(WaveVersion)" />
   </ItemGroup>
 
@@ -18,20 +17,6 @@
     <Content Include="..\..\..\dependencies.json" PackagePath="" Pack="true" Visible="false" />
     <Content Include="bin\$(AssemblyName)\$(Configuration)\$(AssemblyName).dll" PackagePath="dotFiles" Pack="true" Visible="false" />
     <Content Include="bin\$(AssemblyName)\$(Configuration)\$(AssemblyName).pdb" PackagePath="dotFiles" Pack="true" Visible="false" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Reference Include="JetBrains.ReSharper.Cpp">
-      <HintPath>$(PlatformDirectory)\plugins\clion-radler\DotFiles\JetBrains.ReSharper.Cpp.dll</HintPath>
-    </Reference>
-
-    <Reference Include="JetBrains.ReSharper.Feature.Services">
-      <HintPath>$(PlatformDirectory)\plugins\clion-radler\DotFiles\JetBrains.ReSharper.Feature.Services.dll</HintPath>
-    </Reference>
-    
-    <Reference Include="JetBrains.ReSharper.Feature.Services.Cpp">
-      <HintPath>$(PlatformDirectory)\plugins\clion-radler\DotFiles\JetBrains.ReSharper.Feature.Services.Cpp.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
 </Project>

@@ -73,26 +73,6 @@ println("Build Directory: ${layout.buildDirectory.get().asPath}")
 println("Project Directory: ${layout.projectDirectory}")
 println("Platform Directory: ${intellijPlatform.platformPath}")
 
-val generatePlatformDirectoryProp by tasks.registering {
-    val generatedFile = layout.projectDirectory.file("src\\dotnet\\PlatformDirectory.Generated.props")
-    outputs.file(generatedFile)
-
-    doLast {
-        val path = intellijPlatform.platformPath
-        logger.lifecycle("Writing Platform Path to \"${generatedFile.asPath}\"")
-
-        generatedFile.asFile.writeText(
-            """
-            <Project>
-              <PropertyGroup>
-                <PlatformDirectory>$path</PlatformDirectory>
-              </PropertyGroup>
-            </Project>
-            """.trimIndent()
-        )
-    }
-}
-
 // A model artifact separate from rider
 val riderModelSource: Configuration by configurations.creating {
     isCanBeConsumed = false
@@ -174,7 +154,6 @@ val setBuildTool by tasks.registering {
 
 val compileDotNet by tasks.registering {
     dependsOn(setBuildTool)
-    dependsOn(generatePlatformDirectoryProp)
     doLast {
         val executable: String by setBuildTool.get().extra
         val arguments = (setBuildTool.get().extra["args"] as List<String>).toMutableList()
@@ -199,7 +178,6 @@ val testDotNet by tasks.registering {
 }
 
 tasks.buildPlugin {
-    dependsOn(generatePlatformDirectoryProp)
     doLast {
         copy {
             from("${layout.buildDirectory}/distributions/${rootProject.name}-${version}.zip")
@@ -207,17 +185,39 @@ tasks.buildPlugin {
         }
 
         // TODO: See also org.jetbrains.changelog: https://github.com/JetBrains/gradle-changelog-plugin
+//        val changelogText = file("${rootDir}/CHANGELOG.md").readText()
+//        val changelogMatches = Regex("(?s)(-.+?)(?=##|$)").findAll(changelogText)
+//        val changeNotes = changelogMatches.map {
+//            it.groups[1]!!.value.replace("(?s)- ".toRegex(), "\u2022 ").replace("`", "").replace(",", "%2C").replace(";", "%3B")
+//        }.take(1).joinToString()
+
         val changelogText = file("${rootDir}/CHANGELOG.md").readText()
-        val changelogMatches = Regex("(?s)(-.+?)(?=##|$)").findAll(changelogText)
-        val changeNotes = changelogMatches.map {
-            it.groups[1]!!.value.replace("(?s)- ".toRegex(), "\u2022 ").replace("`", "").replace(",", "%2C").replace(";", "%3B")
-        }.take(1).joinToString()
+//        val sectionRegex = Regex(
+//            """^##\s+([^\r\n]+)\r?\n(.*?)(?=^##\s+|\z)""",
+//            setOf(RegexOption.MULTILINE, RegexOption.DOT_MATCHES_ALL)
+//        )
+//
+//        val changelogSection = sectionRegex.findAll(changelogText)
+//            .map { match -> match.groupValues[2] }
+//            .toList()
+//            .last()
+//
+//        val changeNotesText = changelogSection
+//            .lineSequence()
+//            .map { it.trim() }
+//            .filter { it.isNotEmpty() }
+//            .joinToString("\n") { line ->
+//                when {
+//                    line.startsWith("- ") -> "\u2022 ${line.removePrefix("- ")}"
+//                    else -> line
+//                }
+//            }
 
         val executable: String by setBuildTool.get().extra
         val arguments = (setBuildTool.get().extra["args"] as List<String>).toMutableList()
         arguments.add("/t:Pack")
         arguments.add("/p:PackageOutputPath=${rootDir}/output")
-        arguments.add("/p:PackageReleaseNotes=${changeNotes}")
+        arguments.add("/p:PackageReleaseNotes=${changelogText}")
         arguments.add("/p:PackageVersion=${version}")
         providers.exec {
             executable(executable)
@@ -235,11 +235,7 @@ tasks.runIde {
 tasks.patchPluginXml {
     // TODO: See also org.jetbrains.changelog: https://github.com/JetBrains/gradle-changelog-plugin
     val changelogText = file("${rootDir}/CHANGELOG.md").readText()
-    val changelogMatches = Regex("(?s)(-.+?)(?=##|\$)").findAll(changelogText)
-
-    changeNotes.set(changelogMatches.map {
-        it.groups[1]!!.value.replace("(?s)\r?\n".toRegex(), "<br />\n")
-    }.take(1).joinToString())
+    changeNotes.set(changelogText)
 }
 
 tasks.prepareSandbox {

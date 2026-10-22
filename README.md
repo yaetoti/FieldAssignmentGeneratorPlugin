@@ -6,6 +6,8 @@
 
 CLion Nova plugin that generates field assignments for C++ structs and classes from code completion
 
+Available at [JetBrains Marketplace](https://plugins.jetbrains.com/plugin/32982-field-assignment-generator)
+
 Example:
 ```cpp
 D3D12_RESOURCE_DESC desc;  
@@ -26,6 +28,10 @@ desc.Flags = ;
 ```
 
 **⚠️ Alpha version**: Expect occasional bugs and unsupported language constructs while the plugin is being actively developed. If the plugin does behave incorrectly, I'm probably not aware of that, and it should be reported on GitHub Issues.
+
+### Demo
+
+https://github.com/user-attachments/assets/b46c6414-d80f-4f8a-9fcd-211780e184f0
 
 ### Features
 

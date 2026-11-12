@@ -7,6 +7,7 @@ plugins {
     id("java")
     alias(libs.plugins.kotlinJvm)
     // See https://github.com/JetBrains/intellij-platform-gradle-plugin/releases
+    // TODO 2.20.1 breaks plugin for some reason, despite everything is still compiling
     id("org.jetbrains.intellij.platform") version "2.18.0"
     id("me.filippov.gradle.jvm.wrapper") version "0.14.0"
 }
@@ -17,7 +18,6 @@ extra["isWindows"] = isWindows
 val DotnetSolution: String by project
 val BuildConfiguration: String by project
 val ProductVersion: String by project
-val RiderModelVersion: String by project
 val DotnetPluginId: String by project
 val RiderPluginId: String by project
 val PublishToken: String by project
@@ -81,7 +81,7 @@ val riderModelSource: Configuration by configurations.creating {
 }
 
 dependencies {
-    riderModelSource("com.jetbrains.intellij.rider:riderRD:2026.1.4@zip")
+    riderModelSource("com.jetbrains.intellij.rider:riderRD:2026.2.4.1@zip")
 }
 
 val extractedRiderModelJar = layout.buildDirectory.file("riderModel/rider-model.jar")

@@ -6,6 +6,7 @@ using JetBrains.ReSharper.Psi.Cpp.Language;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems;
 using JetBrains.ReSharper.Feature.Services.Cpp.CodeCompletion;
 using JetBrains.ReSharper.Psi;
+using JetBrains.Rider.Model;
 
 namespace ReSharperPlugin.FieldAssignmentGenerator;
 
@@ -43,6 +44,6 @@ public class FieldAssignmentCompletionProvider : ItemsProviderOfSpecificContext<
   }
   
   public override EvaluationMode SupportedEvaluationMode => EvaluationMode.Light;
-  public override CompletionMode SupportedCompletionMode => CompletionMode.Single;
+  //public override CompletionMode SupportedCompletionMode => CompletionMode.Basic; // TODO field got removed. or replaced?
   protected override LookupFocusBehaviour GetLookupFocusBehaviour(CppCodeCompletionContext context) => LookupFocusBehaviour.Soft;
 }

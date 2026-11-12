@@ -65,3 +65,10 @@ This plugin uses a custom build configuration and internal CLion Nova APIs becau
 
 This plugin relies on CLion Nova APIs that are not yet officially documented.
 The project artifacts take approximately 7 GB in the Gradle cache directory.
+
+### Update guide
+
+- gradle.properties: Update ProductVersion
+- build.gradle.kts: Update dependencies/riderModelSource version
+- plugin.xml: Update since-build
+- src/dotnet/Plugin.props: Update SdkVersion
